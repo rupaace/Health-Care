@@ -15,7 +15,7 @@ class PatientListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-class PatientRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+class PatientRetrieveView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PatientSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -35,7 +35,7 @@ class DoctorListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-class DoctorRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+class DoctorRetrieveView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = DoctorSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -55,7 +55,7 @@ class AppointmentListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(patient__user=self.request.user)
 
-class AppointmentRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+class AppointmentRetrieveView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = AppointmentSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -75,7 +75,7 @@ class PrescriptionListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(patient__user=self.request.user)
 
-class PrescriptionRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+class PrescriptionRetrieveView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PrescriptionSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -95,7 +95,7 @@ class MedicalRecordListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(patient__user=self.request.user)
 
-class MedicalRecordRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+class MedicalRecordRetrieveView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = MedicalRecordSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -112,9 +112,18 @@ class InsuranceListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         return Insurance.objects.filter(patient__user=self.request.user)
 
-class InsuranceRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    def perform_create(self, serializer):
+        serializer.save(patient__user=self.request.user)
+
+class InsuranceRetrieveView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = InsuranceSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        try:
+            return Insurance.objects.get(pk=self.kwargs['pk'], patient__user=self.request.user)
+        except Insurance.DoesNotExist:
+            raise NotFound()
 
 class PaymentListCreateView(generics.ListCreateAPIView):
     serializer_class = PaymentSerializer
@@ -126,7 +135,7 @@ class PaymentListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(patient__user=self.request.user)
 
-class PaymentRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+class PaymentRetrieveView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PaymentSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -146,7 +155,7 @@ class TestResultListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(patient__user=self.request.user)
 
-class TestResultRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+class TestResultRetrieveView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = TestResultSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -166,7 +175,7 @@ class ReferralListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(patient__user=self.request.user)
 
-class ReferralRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+class ReferralRetrieveView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ReferralSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -186,7 +195,7 @@ class AllergyListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(patient__user=self.request.user)
 
-class AllergyRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+class AllergyRetrieveView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = AllergySerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -206,7 +215,7 @@ class ImmunizationListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(patient__user=self.request.user)
 
-class ImmunizationRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+class ImmunizationRetrieveView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ImmunizationSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -226,7 +235,7 @@ class FamilyHistoryListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(patient__user=self.request.user)
 
-class FamilyHistoryRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+class FamilyHistoryRetrieveView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = FamilyHistorySerializer
     permission_classes = [permissions.IsAuthenticated]
 
