@@ -1,9 +1,39 @@
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
-
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework import generics, status
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
 from .models import *
 from .serializers import *
+
+class UserRegistrationView(generics.CreateAPIView):
+    serializer_class = UserRegistrationSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
+
+        username = validated_data.get('username')
+        if User.objects.filter(username=username).exists():
+            return Response({'error': 'A user with that username already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = serializer.save()
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        }, status=status.HTTP_201_CREATED)
+
+class UserLoginView(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({'token': token.key})
 
 class PatientListCreateView(generics.ListCreateAPIView):
     serializer_class = PatientSerializer

@@ -3,7 +3,10 @@ from .views import *
 
 app_name = 'healthcare'
 
-urlpatterns = [
+urlpatterns = [    
+    path('register/', UserRegistrationView.as_view(), name='register'),
+    path('login/', UserLoginView.as_view(), name='login'),
+
     # Patient URLs
     path('patients/', PatientListCreateView.as_view(), name='patient_list_create'),
     path('patients/<int:pk>/', PatientRetrieveView.as_view(), name='patient_retrieve'),
